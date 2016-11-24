@@ -1,10 +1,10 @@
 Package.describe({
-    name: 'jalik:mangopay',
-    version: '0.2.5',
+    name: 'jalik:mangopay-cal',
+    version: '0.2.6',
     author: 'karl.stein.pro@gmail.com',
     summary: 'MangoPay REST SDK',
     homepage: 'https://github.com/jalik/jalik-mangopay',
-    git: 'https://github.com/jalik/jalik-mangopay.git',
+    git: 'https://github.com/llebleis/jalik-mangopay.git',
     documentation: 'README.md',
     license: 'MIT'
 });
