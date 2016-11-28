@@ -26,45 +26,41 @@ MangoPaySDK.card = {
      * @param obj
      * @param callback
      */
-    create: function (obj, callback) {
+    create: function (obj, cr, callback) {
         if (!(obj instanceof MangoPaySDK.card.Card)) {
             throw new Error('obj is not instance of Card');
         }
+        if (!(cr instanceof MangoPaySDK.cardRegistraton.CardRegistration)) {
+          console.log(cr);
+            throw new Error('cr is not instance of CardRegistration');
+        }
 
         // Cast Card to CardRegistration
-        var cr = new MangoPaySDK.cardRegistraton.CardRegistration(obj);
+        //var cr = new MangoPaySDK.cardRegistraton.CardRegistration(obj);
 
         // Create the card registration
-        MangoPaySDK.cardRegistraton.create(cr, function (err, result) {
 
-            if (err || !result || result.Status !== MangoPaySDK.cardRegistraton.status.CREATED) {
-                MangoPayClient.callback(err, result, callback);
+        // Send card details
+        console.log("posting to ", cr.CardRegistrationURL, cr);
+        HTTP.post(cr.CardRegistrationURL, {
+            params: {
+                data: cr.PreregistrationData,
+                accessKeyRef: cr.AccessKey,
+                cardNumber: obj.CardNumber,
+                cardExpirationDate: obj.CardExpirationDate,
+                cardCvx: String(obj.CardCvx)
+            }
+        }, function (err, result2) {
+            if (err || !result2 || result2.statusCode !== 200 || !result2.content || result2.content.indexOf('error') === 0) {
+              console.log("ERROR MANGO REG CARD", err);
+                MangoPayClient.callback(err, result2, callback);
             } else {
-                // Send card details
-                HTTP.post(result.CardRegistrationURL, {
-                    params: {
-                        data: result.PreregistrationData,
-                        accessKeyRef: result.AccessKey,
-                        cardNumber: obj.CardNumber,
-                        cardExpirationDate: obj.CardExpirationDate,
-                        cardCvx: String(obj.CardCvx)
-                    }
-                }, function (err, result2) {
-                    if (err || !result2 || result2.statusCode !== 200 || !result2.content || result2.content.indexOf('error') === 0) {
-                        MangoPayClient.callback(err, result2, callback);
-                    } else {
-                        // Save registration data
-                        MangoPaySDK.cardRegistraton.update(result.Id, {
-                            RegistrationData: result2.content
-                        }, function (err, result3) {
-                            if (err || !result3 || result3.Status !== MangoPaySDK.cardRegistraton.status.VALIDATED) {
-                                MangoPayClient.callback(err, result3, callback);
-                            } else {
-                                MangoPaySDK.card.fetch(result3.CardId, callback);
-                            }
-                        });
-                    }
-                });
+              console.log("NO error MANGO REG CARD", err, result2);
+              MangoPayClient.callback(null, {data:{
+                CardRegistrationId: cr.CardRegistrationId,
+                RegistrationData: result2.content
+              }}, callback);
+
             }
         });
     },

@@ -44,10 +44,13 @@ MangoPaySDK.cardRegistraton = {
      * @constructor
      */
     CardRegistration: function (options) {
-        this.CardType = options.CardType;
-        this.Currency = options.Currency;
-        this.UserId = options.UserId;
+        this.CardType = null;
+        this.Currency = null;
+        this.UserId = null;
+        this.PreregistrationData = null;
+        this.AccessKey = null;
+        this.CardRegistrationURL = null;
 
-        //_.extend(this, options);
+        _.extend(this, options);
     }
 };
